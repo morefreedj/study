@@ -29,19 +29,17 @@ def login(request):#前端对应login-register.html第505行
 
             username = login_form.cleaned_data['username']
             password = login_form.cleaned_data['password']
-
             try:
                 user = models.User.objects.get(user_name=username)
-
-                if user.password == password:
-                    request.session['is_login'] = True
-                    request.session['user_id']  = user.id
-                    request.session['user_name']= user.user_name
-                    refresh = request.getSession().getAttribute("refresh")
-                    return redirect('/index/')
-
-                else:
-                    message = "密码有误"
+                if not user is None:
+                    if user.password == password:
+                        request.session['is_login'] = True
+                        request.session['user_id']  = user.id
+                        request.session['user_name']= user.user_name
+                        # refresh = request.getSession().getAttribute("refresh")
+                        return redirect('/index/')
+                    else:
+                        message = "密码有误"
             except:
                 message = "用户名不存在"
     #login_form = UserForm   #如果加上会导致captcha的错误信息传不上去
@@ -91,9 +89,9 @@ def register(request):
                     new_user.email     = email
                     new_user.full_name = fullname
                     new_user.save()
-                    return redirect('/index/')
-
-
+                    request.session['is_login'] = True
+                    request.session['user_name'] = new_user.user_name
+                    return redirect('/index/', locals())
     return render(request, 'login-register.html', locals())
 
 def contact (request):
